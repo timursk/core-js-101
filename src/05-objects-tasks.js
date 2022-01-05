@@ -20,8 +20,14 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  return {
+    width,
+    height,
+    getArea() {
+      return width * height;
+    },
+  };
 }
 
 
@@ -35,8 +41,8 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  return JSON.stringify(obj);
 }
 
 
@@ -51,8 +57,10 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  const parsed = JSON.parse(json);
+  const keys = Object.values(parsed);
+  return new proto.constructor(...keys);
 }
 
 
@@ -109,34 +117,116 @@ function fromJSON(/* proto, json */) {
  *
  *  For more examples see unit tests.
  */
+const orderError = 'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element';
+const severalTimesError = 'Element, id and pseudo-element should not occur more then one time inside the selector';
+
+class Word {
+  constructor(value) {
+    this.value = value;
+    this.isElement = 0;
+    this.isId = 0;
+    this.isClass = 0;
+    this.isAttr = 0;
+    this.isPseudoClass = 0;
+    this.isPseudoElement = 0;
+  }
+
+  element(value) {
+    if (this.isElement) throw new Error(severalTimesError);
+    if (this.isId || this.isClass || this.isAttr
+      || this.isPseudoClass || this.isPseudoClass) throw new Error(orderError);
+    this.isElement = 1;
+    this.value += value;
+    return this;
+  }
+
+  id(value) {
+    if (this.isId) throw new Error(severalTimesError);
+    if (this.isClass || this.isAttr || this.isPseudoClass
+      || this.isPseudoElement) throw new Error(orderError);
+    this.isId = 1;
+    this.value += `#${value}`;
+    return this;
+  }
+
+  class(value) {
+    if (this.isAttr || this.isPseudoClass || this.isPseudoElement) throw new Error(orderError);
+    this.isClass = 1;
+    this.value += `.${value}`;
+    return this;
+  }
+
+  attr(value) {
+    if (this.isPseudoClass || this.isPseudoElement) throw new Error(orderError);
+    this.isAttr = 1;
+    this.value += `[${value}]`;
+    return this;
+  }
+
+  pseudoClass(value) {
+    if (this.isPseudoElement) throw new Error(orderError);
+    this.isPseudoClass = 1;
+    this.value += `:${value}`;
+    return this;
+  }
+
+  pseudoElement(value) {
+    if (this.isPseudoElement) throw new Error(severalTimesError);
+    this.isPseudoElement = 1;
+    this.value += `::${value}`;
+    return this;
+  }
+
+  combine(selector1, combinator, selector2) {
+    this.value += selector1 + combinator + selector2;
+    return this;
+  }
+
+  stringify() {
+    return this.value;
+  }
+}
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    const word = new Word('');
+    word.element(value);
+    return word;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    const word = new Word('');
+    word.id(value);
+    return word;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    const word = new Word('');
+    word.class(value);
+    return word;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    const word = new Word('');
+    word.attr(value);
+    return word;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    const word = new Word('');
+    word.pseudoClass(value);
+    return word;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    const word = new Word('');
+    word.pseudoElement(value);
+    return word;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    const value = `${selector1.value} ${combinator} ${selector2.value}`;
+    return new Word(value);
   },
 };
 
