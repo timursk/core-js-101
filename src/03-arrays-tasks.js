@@ -148,7 +148,7 @@ function getStringsLength(arr) {
  *
  * @example
  *    [ 1, 3, 4, 5 ], 2, 1  => [ 1, 2, 3, 4, 5 ]
- *    [ 1, 'b', 'c'], 0, 'x'  => [ 'x', 1, 'b', 'c' ]
+ *    [ 1, 'b', 'c'], 'x', 0  => [ 'x', 1, 'b', 'c' ]
  */
 function insertItem(arr, item, index) {
   return arr.splice(index, 0, item);
@@ -267,7 +267,7 @@ function getSecondItems(arr) {
 
 /**
  * Propagates every item in sequence its position times
- * Returns an array that consists of: one first item, two second items, tree third items etc.
+ * Returns an array that consists of: one first item, two second items, three third items etc.
  *
  * @param {array} arr
  * @return {array}
@@ -575,7 +575,7 @@ function group(array, keySelector, valueSelector) {
  *
  * @example
  *   [[1, 2], [3, 4], [5, 6]], (x) => x     =>   [ 1, 2, 3, 4, 5, 6 ]
- *   ['one','two','three'], x=>x.split('')  =>   ['o','n','e','t','w','o','t','h','r','e','e']
+ *   ['one','two','three'], (x) => x.split('')  =>   ['o','n','e','t','w','o','t','h','r','e','e']
  */
 function selectMany(arr, childrenSelector) {
   return arr
